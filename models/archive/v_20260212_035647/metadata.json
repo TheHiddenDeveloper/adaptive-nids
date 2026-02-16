@@ -1,0 +1,10 @@
+{
+  "version": "v_20260212_035647",
+  "exported_at": "2026-02-12T03:56:49.865719Z",
+  "threshold": 1.9741076231002808,
+  "feature_count": 85,
+  "model_type": "denoising_autoencoder",
+  "training_flows": "unsupervised_baseline",
+  "adaptive_threshold_percentile": 95,
+  "opset_version": 11
+}
