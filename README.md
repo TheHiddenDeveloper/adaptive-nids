@@ -1,6 +1,4 @@
 
----
-
 ### 📄 `adaptive-nids/README.md`
 ```markdown
 # 🌐 Adaptive Network Intrusion Detection System (NIDS)
@@ -51,6 +49,7 @@ A **self-learning, adaptive NIDS** that learns your network's unique normal traf
 │  • Detects deviations from learned baseline                         │
 │  • Alerts on anomalies with confidence scores                       │
 └─────────────────────────────────────────────────────────────────────┘
+
 ```
 
 ## 🚀 Quick Start (Manjaro/Arch Linux)
