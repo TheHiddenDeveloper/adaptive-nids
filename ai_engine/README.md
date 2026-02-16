@@ -1,8 +1,3 @@
-
----
-
-### 📄 `adaptive-nids/ai_engine/README.md`
-```markdown
 # 🤖 Service 2: AI Learning Engine
 
 Unsupervised adaptive learning engine that learns your network's normal traffic patterns.
@@ -128,4 +123,3 @@ cat models/latest/metadata.json | python -m json.tool
 
 ---
 *Part of Adaptive NIDS architecture | [Project Root](../README.md) | [Project Charter](../PROJECT_CHARTER.md)*
-```

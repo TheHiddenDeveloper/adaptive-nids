@@ -1,8 +1,4 @@
 
----
-
-### 📄 `adaptive-nids/flow_collector/README.md`
-```markdown
 # 📡 Service 1: Flow Collector
 
 Real-time network flow extraction and anomaly detection engine.
@@ -99,4 +95,3 @@ python ../test_redis.py
 
 ---
 *Part of Adaptive NIDS architecture | [Project Root](../README.md) | [Project Charter](../PROJECT_CHARTER.md)*
-```

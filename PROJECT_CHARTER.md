@@ -1,8 +1,3 @@
-
----
-
-### 📄 `adaptive-nids/PROJECT_CHARTER.md`
-```markdown
 # 📜 Adaptive NIDS Project Charter
 
 ## 🎯 CORE OBJECTIVE
