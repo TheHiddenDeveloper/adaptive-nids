@@ -1,6 +1,4 @@
 
-### 📄 `adaptive-nids/README.md`
-
 # 🌐 Adaptive Network Intrusion Detection System (NIDS)
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
@@ -181,4 +179,3 @@ This project strictly follows the constraints defined in [`PROJECT_CHARTER.md`](
 
 ---
 **Built with ❤️ for adaptive network security** | [Project Charter](PROJECT_CHARTER.md)
-```
