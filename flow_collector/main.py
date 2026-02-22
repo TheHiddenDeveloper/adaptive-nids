@@ -39,7 +39,7 @@ class FlowCollectorService:
         # Redis config
         self.redis_client = redis.Redis(
             host=os.getenv("REDIS_HOST", "localhost"),
-            port=int(os.getenv("REDIS_PORT", "6380")),
+            port=int(os.getenv("REDIS_PORT", "6379")),
             password=os.getenv("REDIS_PASSWORD", None),
             decode_responses=True,
             socket_connect_timeout=5
@@ -137,7 +137,7 @@ class FlowCollectorService:
     def run(self):
         logger.info("🚀 Starting Flow Collector Service")
         logger.info(f"   Source: {self.interface}")
-        logger.info(f"   Redis: {os.getenv('REDIS_HOST', 'localhost')}:{os.getenv('REDIS_PORT', '6380')}")
+        logger.info(f"   Redis: {os.getenv('REDIS_HOST', 'localhost')}:{os.getenv('REDIS_PORT', '6379')}")
         logger.info(f"   Model dir: {self.model_dir}")
         
         # Test Redis

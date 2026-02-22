@@ -26,24 +26,28 @@ class ModelRegistry:
         version_dir = self.archive_dir / version
         version_dir.mkdir(exist_ok=True)
         
-        # Export ONNX model (opset 11 for maximum compatibility)
+        # Export ONNX model (use latest supported opset to avoid costly version conversions)
         dummy_input = torch.randn(1, feature_count).to(next(model.parameters()).device)
+        # select an opset version high enough that torch will not auto-upgrade
+        opset_version = 18
         onnx_path = version_dir / "model.onnx"
         
         try:
             # Use export_params=True + do_constant_folding for smaller models
             torch.onnx.export(
                 model,
-                dummy_input,
+                (dummy_input,),
                 str(onnx_path),
                 input_names=["input"],
                 output_names=["reconstruction", "latent"],
-                dynamic_axes={"input": {0: "batch_size"}},
-                opset_version=11,  # ✅ Stable version - no onnxscript required
+                # specify dynamic batch dimension using new API (avoids dynamo warning)
+                dynamic_shapes={"input": {0: "batch_size"}},
+                # request modern opset – torch may still bump this further
+                opset_version=18,  # >=18 avoids automatic up/down conversion issues
                 export_params=True,
                 do_constant_folding=True
             )
-            logger.info(f"✅ Exported ONNX model (opset 11) to {onnx_path}")
+            logger.info(f"✅ Exported ONNX model (opset {opset_version}) to {onnx_path}")
         except ModuleNotFoundError as e:
             # common missing dependency when torch tries to lazily import onnxscript
             logger.error(f"❌ ONNX export failed: {e}")

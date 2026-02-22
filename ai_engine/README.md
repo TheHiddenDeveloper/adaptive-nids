@@ -66,7 +66,7 @@ curl -X POST http://localhost:8001/api/feedback \
 ```
 models/
 ├── latest/ → archive/v_20260212_143000
-│   ├── model.onnx          # ONNX model (opset 11)
+│   ├── model.onnx          # ONNX model (opset 18)
 │   ├── scaler.pkl          # Feature scaler
 │   └── metadata.json       # Threshold, feature count, etc.
 └── archive/
@@ -86,7 +86,7 @@ models/
   "model_type": "denoising_autoencoder",
   "training_flows": "unsupervised_baseline",
   "adaptive_threshold_percentile": 95,
-  "opset_version": 11
+  "opset_version": 18
 }
 ```
 
@@ -118,7 +118,7 @@ cat models/latest/metadata.json | python -m json.tool
 | Issue | Solution |
 |-------|----------|
 | "Insufficient flows" error | Generate test flows or wait for real traffic |
-| ONNX export fails | Ensure opset_version=11 (configured in model_registry.py) |
+| ONNX export fails | Ensure opsetet_version=18 (configured in model_registry.py) |
 | Symlink errors | Delete `models/latest` directory and restart |
 | `ModuleNotFoundError: No module named 'onnxscript'` | install `onnxscript` (e.g. `pip install onnxscript`) or add to your environment |
 | Concept drift false positives | Increase drift ratio threshold in `concept_drift.py` (default: 1.3x) |
