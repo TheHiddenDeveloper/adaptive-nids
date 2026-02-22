@@ -19,6 +19,7 @@ redis>=5.0.0
 fastapi>=0.100.0
 uvicorn>=0.23.0
 onnx>=1.14.0
+onnxscript>=0.1.0            # required by newer torch/onnx exports
 joblib>=1.3.0
 ```
 
@@ -119,6 +120,7 @@ cat models/latest/metadata.json | python -m json.tool
 | "Insufficient flows" error | Generate test flows or wait for real traffic |
 | ONNX export fails | Ensure opset_version=11 (configured in model_registry.py) |
 | Symlink errors | Delete `models/latest` directory and restart |
+| `ModuleNotFoundError: No module named 'onnxscript'` | install `onnxscript` (e.g. `pip install onnxscript`) or add to your environment |
 | Concept drift false positives | Increase drift ratio threshold in `concept_drift.py` (default: 1.3x) |
 
 ---

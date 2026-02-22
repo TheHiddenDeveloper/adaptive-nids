@@ -158,8 +158,14 @@ class AILearningEngine:
         return True
 
 if __name__ == "__main__":
-    model_dir = os.getenv("MODEL_DIR", "/models")
-    os.makedirs(model_dir, exist_ok=True)
+    # environment variable override; default to relative path so unprivileged users don't hit /models
+    model_dir = os.getenv('MODEL_DIR', './models')
+    try:
+        os.makedirs(model_dir, exist_ok=True)
+    except PermissionError:
+        logger.warning(f'cannot create MODEL_DIR={model_dir}, falling back to ./models')
+        model_dir = './models'
+        os.makedirs(model_dir, exist_ok=True)
     
     engine = AILearningEngine()
     success = engine.run()

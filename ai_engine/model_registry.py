@@ -44,6 +44,12 @@ class ModelRegistry:
                 do_constant_folding=True
             )
             logger.info(f"✅ Exported ONNX model (opset 11) to {onnx_path}")
+        except ModuleNotFoundError as e:
+            # common missing dependency when torch tries to lazily import onnxscript
+            logger.error(f"❌ ONNX export failed: {e}")
+            logger.error("   (hint: install the 'onnxscript' package or an appropriate onnx runtime build)")
+            logger.info("⚠️  Falling back to PyTorch save (Service 1 will need torch)")
+            torch.save(model.state_dict(), version_dir / "model.pth")
         except Exception as e:
             logger.error(f"❌ ONNX export failed: {e}")
             logger.info("⚠️  Falling back to PyTorch save (Service 1 will need torch)")
@@ -74,28 +80,46 @@ class ModelRegistry:
         return version_dir
     
     def _update_latest_symlink(self, target_dir: Path):
-        """Safely update 'latest' symlink (handles directory leftovers)"""
-        if self.latest_dir.exists():
-            if self.latest_dir.is_symlink():
-                # Normal case: remove existing symlink
-                os.unlink(self.latest_dir)
-                logger.debug("Removed existing 'latest' symlink")
-            elif self.latest_dir.is_dir():
-                # Error case: 'latest' is a directory (from interrupted previous run)
-                backup_name = f"latest_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-                backup_path = self.model_dir / backup_name
-                shutil.move(str(self.latest_dir), str(backup_path))
-                logger.warning(f"⚠️  'latest' was a directory (not symlink). Backed up to {backup_name}")
-            else:
-                # Unexpected case: file (not dir/symlink)
-                self.latest_dir.unlink()
-                logger.warning("⚠️  'latest' was a regular file - removed")
-        
-        # Create new symlink
+        """Safely update 'latest' symlink (handles directory leftovers)
+
+        We aggressively clean up whatever already exists at ``latest`` before
+        creating the new symlink.  ``os.symlink`` will raise ``FileExistsError``
+        if the destination path already exists, which is exactly what was
+        observed in the logs during normal operation.  After a failed
+        symlink attempt we erase the target and fall back to copying the
+        versioned directory so the learning engine can continue without a
+        broken link.
+        """
+        # remove any pre-existing entity (symlink, file or directory)
+        if self.latest_dir.exists() or self.latest_dir.is_symlink():
+            try:
+                if self.latest_dir.is_symlink() or self.latest_dir.is_file():
+                    os.unlink(self.latest_dir)
+                    logger.debug("Removed existing 'latest' symlink/file")
+                elif self.latest_dir.is_dir():
+                    backup_name = f"latest_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}"
+                    backup_path = self.model_dir / backup_name
+                    shutil.move(str(self.latest_dir), str(backup_path))
+                    logger.warning(
+                        f"⚠️  'latest' was a directory (not symlink); backed up to {backup_name}"
+                    )
+            except Exception as cleanup_err:
+                logger.warning(f"⚠️  unable to clean up old 'latest' entry: {cleanup_err}")
+
+        # try creating the symlink; if it still fails fall back to copy
         try:
             os.symlink(target_dir.absolute(), self.latest_dir)
             logger.debug(f"Created symlink: latest -> {target_dir.name}")
         except OSError as e:
             logger.error(f"❌ Symlink creation failed: {e}")
             logger.info("⚠️  Falling back to directory copy (less efficient)")
+            # ensure nothing remains before copying
+            if self.latest_dir.exists() or self.latest_dir.is_symlink():
+                try:
+                    if self.latest_dir.is_dir():
+                        shutil.rmtree(self.latest_dir)
+                    else:
+                        os.unlink(self.latest_dir)
+                except Exception as rm_err:
+                    logger.warning(f"⚠️  could not remove existing fallback target: {rm_err}")
             shutil.copytree(target_dir, self.latest_dir, dirs_exist_ok=True)

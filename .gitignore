@@ -40,3 +40,11 @@ coverage/
 # Temporary files
 *.tmp
 *.bak
+# Python virtual environments
+venv/
+env/
+.venv/
+
+# model artifacts created at runtime
+models/
+models_test/
